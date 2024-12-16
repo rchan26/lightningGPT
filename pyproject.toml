@@ -1,0 +1,22 @@
+[project]
+name = "lightningpt"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "lightning>=2.4.0",
+    "torch>=2.5.1",
+    "transformers>=4.47.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "black>=24.10.0",
+    "isort>=5.13.2",
+    "pre-commit>=4.0.1",
+]
