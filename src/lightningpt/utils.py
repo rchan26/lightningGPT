@@ -25,4 +25,3 @@ class ModelArgs:
     max_batch_size: int = 32
     max_seq_len: int = 2048
     vocab_size: int = -1
-    

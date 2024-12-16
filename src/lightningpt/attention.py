@@ -41,9 +41,7 @@ class CausalSelfAttention(nn.Module):
         self.n_embd = config.n_embd
         self.head_size = config.n_embd // config.n_head
         # number of times to repeat key, value tensors
-        self.n_rep = (
-            self.n_head // self.n_kv_heads
-        )
+        self.n_rep = self.n_head // self.n_kv_heads
 
         # key, query, value projections for all heads, but in a batch
         # in MHA case where n_head = n_kv_heads, the output is just 3 * n_embd
@@ -109,19 +107,15 @@ class CausalSelfAttention(nn.Module):
             )
 
         # (B, nh, T, hs)
-        q = q.view(B, T, self.n_head, self.head_size).transpose(1, 2)  
+        q = q.view(B, T, self.n_head, self.head_size).transpose(1, 2)
         # (B, n_kv_h, T, hs)
-        xk = xk.view(B, T, self.n_kv_heads, self.head_size).transpose(
-            1, 2
-        )
-        xv = xv.view(B, T, self.n_kv_heads, self.head_size).transpose(
-            1, 2
-        )  
+        xk = xk.view(B, T, self.n_kv_heads, self.head_size).transpose(1, 2)
+        xv = xv.view(B, T, self.n_kv_heads, self.head_size).transpose(1, 2)
 
         # if enabled, use key, value cache to speed up computation during inference
         if use_kv_cache:
             # check if cache is initialised; if not, initialise it to maximum batch and sequence lengths
-             # (max(B), nh, max(T), hs)
+            # (max(B), nh, max(T), hs)
             if self.cache_k is None:
                 self.cache_k = torch.zeros(
                     self.max_batch_size,
@@ -153,7 +147,7 @@ class CausalSelfAttention(nn.Module):
 
         # repeat key and value heads if n_kv_heads < n_heads
         # (B, nh, T, hs)
-        k = repeat_kv(k, self.n_rep)  
+        k = repeat_kv(k, self.n_rep)
         v = repeat_kv(v, self.n_rep)
 
         # causal self-attention
@@ -164,10 +158,10 @@ class CausalSelfAttention(nn.Module):
         att = self.attn_dropout(att)
 
         # (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)
-        y = att @ v  
+        y = att @ v
         # re-assemble all head outputs side by side
         y = y.transpose(1, 2).contiguous().view(B, T, C)
-        
+
         # output projection
         y = self.resid_dropout(self.c_proj(y))
         return y
